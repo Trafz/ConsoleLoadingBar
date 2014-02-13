@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleLoadingBar", "ConsoleLoadingBar\ConsoleLoadingBar.csproj", "{7BEB7DFB-607B-410A-B86D-BEBD758C7BA6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleLoadingBar.TestApp", "ConsoleLoadingBar.TestApp\ConsoleLoadingBar.TestApp.csproj", "{520B2897-05BE-484A-A521-44C0A0A8631F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7BEB7DFB-607B-410A-B86D-BEBD758C7BA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BEB7DFB-607B-410A-B86D-BEBD758C7BA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BEB7DFB-607B-410A-B86D-BEBD758C7BA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BEB7DFB-607B-410A-B86D-BEBD758C7BA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{520B2897-05BE-484A-A521-44C0A0A8631F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{520B2897-05BE-484A-A521-44C0A0A8631F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{520B2897-05BE-484A-A521-44C0A0A8631F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{520B2897-05BE-484A-A521-44C0A0A8631F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
