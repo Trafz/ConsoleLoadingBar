@@ -10,11 +10,24 @@ namespace ConsoleLoadingBar.TestApp
         {
             PleaseBeConsistent();
 
+            TestCase2();
+
+            KeepCommandOpen();
+        }
+
+
+        public static void TestCase1()
+        {
             TestSingleLoadingBar();
             TestMultipleLoadingBar();
             TestSingleLoadingBar();
+        }
+        public static void TestCase2()
+        {
+            for (int i = 0; i <= Console.BufferHeight; i++)
+                Console.WriteLine(i);
 
-            KeepCommandOpen();
+            TestCase1();
         }
 
 
