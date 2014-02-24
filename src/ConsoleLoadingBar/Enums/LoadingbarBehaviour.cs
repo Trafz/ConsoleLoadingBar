@@ -3,8 +3,9 @@
 namespace ConsoleLoadingBar.Enums
 {
     [Flags]
-    public enum LoadingbarBehaviour
+    public enum LoadingBarBehaviour
     {
+        Null = 0,
         ClearWhenHundredPercentIsHit = 1 << 0
     }
 }

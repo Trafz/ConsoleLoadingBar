@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.Threading;
 
@@ -10,6 +11,7 @@ namespace ConsoleLoadingBar.TestApp
         {
             PleaseBeConsistent();
 
+            TestCase1();
             TestCase2();
 
             KeepCommandOpen();
@@ -18,16 +20,24 @@ namespace ConsoleLoadingBar.TestApp
 
         public static void TestCase1()
         {
+            StartTestCase();
+
             TestSingleLoadingBar();
             TestMultipleLoadingBar();
             TestSingleLoadingBar();
+
+            EndTestCase();
         }
         public static void TestCase2()
         {
+            StartTestCase();
+
             for (int i = 0; i <= Console.BufferHeight; i++)
                 Console.WriteLine(i);
 
             TestCase1();
+
+            EndTestCase();
         }
 
 
@@ -53,13 +63,22 @@ namespace ConsoleLoadingBar.TestApp
                 for (int i = 0; i < total * amountOfBars; i++)
                 {
                     int guess = random.Next(0, amountOfBars);
+                    bool hasWaited = false;
                     while (raceBarrier[guess] == total)
+                    {
+                        if (!hasWaited)
+                        {
+                            Thread.Sleep(_millisecondsTimeout * multipleBars.LoadingBars.Count);
+                            hasWaited = true;
+                        }
                         guess = random.Next(0, amountOfBars);
+                    }
 
                     multipleBars.LoadingBars[guess].Update();
                     raceBarrier[guess]++;
 
-                    Thread.Sleep(10);
+                    if (!hasWaited)
+                        Thread.Sleep(_millisecondsTimeout * multipleBars.LoadingBars.Count);
                 }
             }
         }
@@ -104,11 +123,34 @@ namespace ConsoleLoadingBar.TestApp
                         Console.Write("100%");
 
                     loadingBar.Update();
-                    Thread.Sleep(2);
+                    Thread.Sleep(_millisecondsTimeout);
                 }
             }
         }
 
+        private static void StartTestCase()
+        {
+            _hasJustPaused = false;
+        }
+        private static void EndTestCase()
+        {
+            PauseConsole(string.Format("TestCase completed. {0}", PressAnyKey));
+        }
+
+        private static void PauseConsole(string message = PressAnyKey, bool skipIfJustPaused = true)
+        {
+            if (!Debugger.IsAttached)
+                return;
+
+            if (skipIfJustPaused && _hasJustPaused)
+                return;
+
+            if (string.IsNullOrWhiteSpace(message) == false)
+                Console.Write(message);
+
+            Console.ReadKey();
+            _hasJustPaused = true;
+        }
 
         private static void PleaseBeConsistent()
         {
@@ -119,11 +161,19 @@ namespace ConsoleLoadingBar.TestApp
             if (!Debugger.IsAttached)
                 return;
 
-            Console.Write("Press any key to continue . . ."); Console.ReadKey();
+            PauseConsole();
         }
 
         private static void GetAppSettings()
         {
+            string sleepLength = ConfigurationManager.AppSettings["TestApp.SleepLength"];
+            if (!int.TryParse(sleepLength, out _millisecondsTimeout))
+                _millisecondsTimeout = 2;
         }
+
+
+        private static int _millisecondsTimeout;
+        private static bool _hasJustPaused;
+        private const string PressAnyKey = "Press any key to continue . . .";
     }
 }

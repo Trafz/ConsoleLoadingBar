@@ -30,9 +30,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ConsoleOperator.cs" />
     <Compile Include="Enums\LoadingBarConstAppSettingsNames.cs" />
-    <Compile Include="Enums\LoadingbarBehaviour.cs" />
+    <Compile Include="Enums\LoadingBarBehaviour.cs" />
     <Compile Include="Helpers\LoadingBarAppSettingsHelper.cs" />
+    <Compile Include="Helpers\LoadingBarBehaviourHelper.cs" />
     <Compile Include="SingleLoadingBar.cs" />
     <Compile Include="MultipleLoadingBars.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
