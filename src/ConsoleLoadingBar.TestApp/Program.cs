@@ -5,17 +5,11 @@ using System.Threading;
 
 namespace ConsoleLoadingBar.TestApp
 {
-    class Program
+    internal class Program
     {
-        static void Main()
-        {
-            PleaseBeConsistent();
-
-            TestCase1();
-            TestCase2();
-
-            KeepCommandOpen();
-        }
+        private const string PressAnyKey = "Press any key to continue . . .";
+        private static int _millisecondsTimeout;
+        private static bool _hasJustPaused;
 
 
         public static void TestCase1()
@@ -28,6 +22,7 @@ namespace ConsoleLoadingBar.TestApp
 
             EndTestCase();
         }
+
         public static void TestCase2()
         {
             StartTestCase();
@@ -40,6 +35,12 @@ namespace ConsoleLoadingBar.TestApp
             EndTestCase();
         }
 
+        public static void TestSingleLoadingBar()
+        {
+            Console.Write("Testing my SingleLoadingBar: ");
+            RunSingleLoadingBar();
+            Console.WriteLine("Done");
+        }
 
         public static void TestMultipleLoadingBar()
         {
@@ -47,6 +48,8 @@ namespace ConsoleLoadingBar.TestApp
             RunMultipleLoadingBar();
             Console.WriteLine("Done");
         }
+
+
         private static void RunMultipleLoadingBar()
         {
             const int total = 100;
@@ -71,10 +74,15 @@ namespace ConsoleLoadingBar.TestApp
                             Thread.Sleep(_millisecondsTimeout * multipleBars.LoadingBars.Count);
                             hasWaited = true;
                         }
+
                         guess = random.Next(0, amountOfBars);
                     }
 
-                    multipleBars.LoadingBars[guess].Update();
+                    SingleLoadingBar bar = multipleBars.LoadingBars[guess];
+                    if (bar == null)
+                        throw new NullReferenceException("bar in RunMultipleLoadingBar()");
+
+                    bar.Update();
                     raceBarrier[guess]++;
 
                     if (!hasWaited)
@@ -83,12 +91,6 @@ namespace ConsoleLoadingBar.TestApp
             }
         }
 
-        public static void TestSingleLoadingBar()
-        {
-            Console.Write("Testing my SingleLoadingBar: ");
-            RunSingleLoadingBar();
-            Console.WriteLine("Done");
-        }
         private static void RunSingleLoadingBar()
         {
             using (var loadingBar = new SingleLoadingBar(1000))
@@ -102,6 +104,7 @@ namespace ConsoleLoadingBar.TestApp
                         Console.Write("20%");
                         Console.WriteLine(Environment.NewLine + "1/5");
                     }
+
                     if (i == loadingBar.Total / 100 * 30)
                         Console.Write("30%");
                     if (i == loadingBar.Total / 100 * 40)
@@ -113,6 +116,7 @@ namespace ConsoleLoadingBar.TestApp
                         Console.Write("60%");
                         Console.WriteLine(Environment.NewLine + "6/10");
                     }
+
                     if (i == loadingBar.Total / 100 * 70)
                         Console.Write("70%");
                     if (i == loadingBar.Total / 100 * 80)
@@ -132,6 +136,7 @@ namespace ConsoleLoadingBar.TestApp
         {
             _hasJustPaused = false;
         }
+
         private static void EndTestCase()
         {
             PauseConsole(string.Format("TestCase completed. {0}", PressAnyKey));
@@ -156,6 +161,7 @@ namespace ConsoleLoadingBar.TestApp
         {
             GetAppSettings();
         }
+
         private static void KeepCommandOpen()
         {
             if (!Debugger.IsAttached)
@@ -172,8 +178,14 @@ namespace ConsoleLoadingBar.TestApp
         }
 
 
-        private static int _millisecondsTimeout;
-        private static bool _hasJustPaused;
-        private const string PressAnyKey = "Press any key to continue . . .";
+        private static void Main()
+        {
+            PleaseBeConsistent();
+
+            TestCase1();
+            TestCase2();
+
+            KeepCommandOpen();
+        }
     }
 }

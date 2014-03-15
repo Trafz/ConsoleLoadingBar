@@ -3,11 +3,29 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using ConsoleLoadingBar.Enums;
 using ConsoleLoadingBar.Helpers;
+using JetBrains.Annotations;
 
 namespace ConsoleLoadingBar
 {
     public class MultipleConsoleLoadingBars : IDisposable
     {
+        [NotNull]
+        private readonly ConsoleOperator _consoleOperator;
+        [NotNull]
+        private readonly List<SingleLoadingBar> _loadingBars = new List<SingleLoadingBar>();
+        [NotNull]
+        private readonly object _syncRegulate = new object();
+
+        private readonly LoadingBarBehaviour _behaviour;
+        private readonly int _locationLine;
+        private readonly int _locationRow;
+
+        [NotNull]
+        private ConcurrentBag<ConsoleColor> _colors = new ConcurrentBag<ConsoleColor>();
+
+        private int _regulate;
+
+
         public MultipleConsoleLoadingBars()
         {
             _locationRow = Console.CursorTop;
@@ -20,25 +38,57 @@ namespace ConsoleLoadingBar
             _behaviour = LoadingBarBehaviourHelper.GetAppSettingsForMultipleBars();
         }
 
-        private readonly List<SingleLoadingBar> _loadingBars = new List<SingleLoadingBar>();
+        [NotNull]
         public IReadOnlyList<SingleLoadingBar> LoadingBars
         {
             get { return new List<SingleLoadingBar>(_loadingBars); }
         }
 
 
-        public ConcurrentBag<ConsoleColor> Colors { get; set; }
+        [NotNull]
+        public ConcurrentBag<ConsoleColor> Colors
+        {
+            get
+            {
+                return _colors;
+            }
+
+            set
+            {
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                // ReSharper disable once HeuristicUnreachableCode
+                if (value == null)
+                    return;
+
+                _colors = value;
+            }
+        }
+
+        public void Dispose()
+        {
+            if (LoadingBarAppSettingsHelper.AllowLineBreaks() && _regulate != 0)
+            {
+                lock (_syncRegulate)
+                {
+                    _regulate++;
+                }
+            }
+
+            CleanUp();
+        }
+
         public void ResetColors()
         {
             Colors = new ConcurrentBag<ConsoleColor>
-                {
-                    ConsoleColor.Green,
-                    ConsoleColor.Red,
-                    ConsoleColor.Yellow,
-                    ConsoleColor.Blue,
-                    ConsoleColor.White
-                };
+            {
+                ConsoleColor.Green, 
+                ConsoleColor.Red, 
+                ConsoleColor.Yellow, 
+                ConsoleColor.Blue, 
+                ConsoleColor.White
+            };
         }
+
         public ConsoleColor PickNextColor()
         {
             ConsoleColor color;
@@ -72,43 +122,84 @@ namespace ConsoleLoadingBar
             var loadingBar = new SingleLoadingBar(total, '\x2592', color, message, _consoleOperator, _locationLine)
             {
                 AlternateGetBackToRow = GetStartLocation(),
-                //Behaviour = LoadingBarBehaviour.ClearWhenHundredPercentIsHit
+
+                // Behaviour = LoadingBarBehaviour.ClearWhenHundredPercentIsHit
                 Behaviour = _behaviour
             };
             AddLoadingBar(loadingBar);
 
             int startLocation = GetStartLocation();
-            int asd = Console.BufferHeight - _loadingBars.Count * 2 - 1;
-            if (startLocation >= asd)
+            if (startLocation >= Console.BufferHeight - (_loadingBars.Count * 2) - 1)
             {
-                for (int i = 0; i < _loadingBars.Count; i++)
+                foreach (SingleLoadingBar singleLoadingBar in _loadingBars)
                 {
-                    int a = _loadingBars[i].AlternateGetBackToRow;
+                    if (singleLoadingBar == null)
+                        throw new NullReferenceException("singleLoadingBar in CreateNewLoadingBar()");
+
+                    int a = singleLoadingBar.AlternateGetBackToRow;
                     int b = GetStartLocation();
                     if (a != b)
                     {
-                        _loadingBars[i].AlternateGetBackToRow = b;
+                        singleLoadingBar.AlternateGetBackToRow = b;
                     }
                 }
             }
-            /* You do NOT need a GotoStart() here.
-             * If you want to place one, then you've made an error somewhere
-             * GotoStart(); */
 
+            /* You do NOT need a GotoStart() here.
+                         * If you want to place one, then you've made an error somewhere
+                         * GotoStart(); */
             return loadingBar;
         }
 
+        public void AddLoadingBar(SingleLoadingBar loadingBar)
+        {
+            if (loadingBar == null)
+                return;
+
+            loadingBar.Update(0);
+            _loadingBars.Add(loadingBar);
+        }
+
+        public void CleanUp()
+        {
+            GotoStart();
+            Console.CursorTop++;
+
+            lock (_syncRegulate)
+            {
+                bool goingLast = false;
+
+                for (int i = 0; i < _loadingBars.Count * 2; i++)
+                {
+                    _consoleOperator.ClearLine(ref _regulate, goingLast);
+
+                    if (i == (_loadingBars.Count * 2) - 2)
+                        goingLast = true;
+                }
+            }
+
+            GotoStart();
+        }
+
+        public int GetStartLocation()
+        {
+            return _locationRow - _regulate;
+        }
+
+
         private void GotoLineAboveNextBar()
         {
-            int row = GetStartLocation() + _loadingBars.Count * 2;
+            int row = GetStartLocation() + (_loadingBars.Count * 2);
             if (row >= Console.BufferHeight)
                 throw new Exception("Need more space!");
 
             Console.CursorTop = row;
         }
+
         private void MakeSureWeHaveSpaceForNewLoadingBar()
         {
-            int asd = GetStartLocation() + (_loadingBars.Count + 1) * 2;
+            int asd = GetStartLocation() + ((_loadingBars.Count + 1) * 2);
+            // ReSharper disable once UnusedVariable
             int regulate = _regulate; // TODO: Check if this if-else could be (_regulate != 0)
             if (asd < Console.BufferHeight) // This one is for TestCase1
                 return;
@@ -127,6 +218,9 @@ namespace ConsoleLoadingBar
 
                 foreach (SingleLoadingBar loadingBar in _loadingBars)
                 {
+                    if (loadingBar == null)
+                        throw new NullReferenceException("loadingBar in MakeSureWeHaveSpaceForNewLoadingBar()");
+
                     loadingBar.UpdateRegular(total);
                 }
             }
@@ -134,64 +228,11 @@ namespace ConsoleLoadingBar
             GotoStart();
         }
 
-        public void AddLoadingBar(SingleLoadingBar loadingBar)
-        {
-            loadingBar.Update(0);
-            _loadingBars.Add(loadingBar);
-        }
-
-
-        public void CleanUp()
-        {
-            GotoStart();
-            Console.CursorTop++;
-
-            lock (_syncRegulate)
-            {
-                bool goingLast = false;
-
-                for (int i = 0; i < _loadingBars.Count * 2; i++)
-                {
-                    _consoleOperator.ClearLine(ref _regulate, goingLast);
-
-                    if (i == _loadingBars.Count * 2 - 2)
-                        goingLast = true;
-                }
-            }
-
-            GotoStart();
-        }
-
-        public void Dispose()
-        {
-            if (LoadingBarAppSettingsHelper.AllowLineBreaks() && _regulate != 0)
-            {
-                lock (_syncRegulate)
-                {
-                    _regulate++;
-                }
-            }
-
-            CleanUp();
-        }
 
         private void GotoStart()
         {
             Console.CursorTop = GetStartLocation();
             Console.CursorLeft = _locationLine;
         }
-
-        public int GetStartLocation()
-        {
-            return _locationRow - _regulate;
-        }
-
-
-        private readonly object _syncRegulate = new object();
-        private readonly int _locationRow;
-        private readonly int _locationLine;
-        private readonly ConsoleOperator _consoleOperator;
-        private int _regulate;
-        private LoadingBarBehaviour _behaviour;
     }
 }

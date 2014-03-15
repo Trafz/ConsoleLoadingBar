@@ -27,6 +27,7 @@ namespace ConsoleLoadingBar
                 Console.Write(Environment.NewLine);
             }
         }
+
         public void ClearLine(ref int lockedRegulateProperty, bool goingLast = false)
         {
             if (IsConsoleApp == false)
@@ -49,11 +50,13 @@ namespace ConsoleLoadingBar
             else
                 AlmostClearLineButEndAtTheLastOne();
         }
+
         private static void ClearLineAndEndOnNext()
         {
             for (int i = 0; i < Console.WindowWidth; i++)
                 Console.Write(' ');
         }
+
         private static void AlmostClearLineButEndAtTheLastOne()
         {
             for (int i = 0; i < Console.WindowWidth - 1; i++)

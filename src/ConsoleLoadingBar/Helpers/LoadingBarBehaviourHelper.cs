@@ -17,7 +17,11 @@ namespace ConsoleLoadingBar.Helpers
             foreach (string enumName in enumNames)
             {
                 if (LoadingBarAppSettingsHelper.GetSettingAsBool(prefix + enumName))
-                    behaviour = behaviour | (LoadingBarBehaviour)a.GetValue(counter);
+                {
+                    var o = a.GetValue(counter);
+                    if (o != null)
+                        behaviour = behaviour | (LoadingBarBehaviour)o;
+                }
 
                 counter++;
             }
