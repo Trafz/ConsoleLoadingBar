@@ -9,7 +9,7 @@ namespace ConsoleLoadingBar.Helpers
         {
             const string prefix = "ConsoleLoadingBar.Behaviour.Multiple.";
 
-            var behaviour = LoadingBarBehaviour.Null;
+            var behaviour = LoadingBarBehaviour.Default;
 
             string[] enumNames = Enum.GetNames(typeof(LoadingBarBehaviour));
             Array a = Enum.GetValues(typeof(LoadingBarBehaviour));
