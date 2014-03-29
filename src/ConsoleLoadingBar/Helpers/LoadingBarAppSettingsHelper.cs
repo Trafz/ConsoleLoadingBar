@@ -1,7 +1,8 @@
 ﻿using System.Configuration;
-using ConsoleLoadingBar.Enums;
+using ConsoleLoadingBar.Core.Enums;
+using JetBrains.Annotations;
 
-namespace ConsoleLoadingBar.Helpers
+namespace ConsoleLoadingBar.Core.Helpers
 {
     public static class LoadingBarAppSettingsHelper
     {
@@ -10,8 +11,12 @@ namespace ConsoleLoadingBar.Helpers
             return GetSettingAsBool(LoadingBarConstAppSettingsNames.AllowLineBreaks);
         }
 
-        public static bool GetSettingAsBool(string key)
+        [ContractAnnotation("null => false")]
+        public static bool GetSettingAsBool([CanBeNull] string key)
         {
+            if (string.IsNullOrWhiteSpace(key))
+                return false;
+
             string setting = ConfigurationManager.AppSettings[key];
             if (string.IsNullOrWhiteSpace(setting))
                 return false;

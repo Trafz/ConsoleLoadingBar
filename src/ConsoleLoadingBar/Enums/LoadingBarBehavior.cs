@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace ConsoleLoadingBar.Enums
+namespace ConsoleLoadingBar.Core.Enums
 {
     [Flags]
-    public enum LoadingBarBehaviour
+    public enum LoadingBarBehavior
     {
         Default = 0,
         ClearWhenHundredPercentIsHit = 1 << 0,

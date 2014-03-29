@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using ConsoleLoadingBar.Enums;
-using ConsoleLoadingBar.Helpers;
+using ConsoleLoadingBar.Core.Enums;
+using ConsoleLoadingBar.Core.Helpers;
 using JetBrains.Annotations;
 
-namespace ConsoleLoadingBar
+namespace ConsoleLoadingBar.Core
 {
     public class MultipleConsoleLoadingBars : IDisposable
     {
@@ -16,7 +16,7 @@ namespace ConsoleLoadingBar
         [NotNull]
         private readonly object _syncRegulate = new object();
 
-        private readonly LoadingBarBehaviour _behaviour;
+        private readonly LoadingBarBehavior _behavior;
         private readonly int _locationLine;
         private readonly int _locationRow;
 
@@ -28,14 +28,16 @@ namespace ConsoleLoadingBar
 
         public MultipleConsoleLoadingBars()
         {
-            _locationRow = Console.CursorTop;
-            _locationLine = Console.CursorLeft;
-
             _consoleOperator = new ConsoleOperator();
+            if (_consoleOperator.IsConsoleApp)
+            {
+                _locationRow = Console.CursorTop;
+                _locationLine = Console.CursorLeft;
+            }
 
             ResetColors();
 
-            _behaviour = LoadingBarBehaviourHelper.GetAppSettingsForMultipleBars();
+            _behavior = LoadingBarBehaviorHelper.GetAppSettingsForMultipleBars();
         }
 
         [NotNull]
@@ -46,6 +48,7 @@ namespace ConsoleLoadingBar
 
 
         [NotNull]
+        // ReSharper disable once MemberCanBePrivate.Global
         public ConcurrentBag<ConsoleColor> Colors
         {
             get
@@ -89,6 +92,7 @@ namespace ConsoleLoadingBar
             };
         }
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public ConsoleColor PickNextColor()
         {
             ConsoleColor color;
@@ -108,12 +112,14 @@ namespace ConsoleLoadingBar
         }
 
 
+        // ReSharper disable once UnusedMethodReturnValue.Global
+        [CanBeNull]
         public SingleLoadingBar CreateNewLoadingBar(int total, ConsoleColor color = ConsoleColor.Black, string message = null)
         {
             if (color == ConsoleColor.Black)
                 color = PickNextColor();
 
-            if (Console.CursorTop != GetStartLocation())
+            if (_consoleOperator.IsConsoleApp && Console.CursorTop != GetStartLocation())
                 throw new Exception();
 
             MakeSureWeHaveSpaceForNewLoadingBar();
@@ -123,10 +129,13 @@ namespace ConsoleLoadingBar
             {
                 AlternateGetBackToRow = GetStartLocation(),
 
-                // Behaviour = LoadingBarBehaviour.ClearWhenHundredPercentIsHit
-                Behaviour = _behaviour
+                // Behavior = LoadingBarBehavior.ClearWhenHundredPercentIsHit
+                Behavior = _behavior
             };
             AddLoadingBar(loadingBar);
+
+            if (!_consoleOperator.IsConsoleApp)
+                return loadingBar;
 
             int startLocation = GetStartLocation();
             if (startLocation >= Console.BufferHeight - (_loadingBars.Count * 2) - 1)
@@ -146,11 +155,12 @@ namespace ConsoleLoadingBar
             }
 
             /* You do NOT need a GotoStart() here.
-                         * If you want to place one, then you've made an error somewhere
-                         * GotoStart(); */
+             * If you want to place one, then you've made an error somewhere
+             * GotoStart(); */
             return loadingBar;
         }
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public void AddLoadingBar(SingleLoadingBar loadingBar)
         {
             if (loadingBar == null)
@@ -160,8 +170,12 @@ namespace ConsoleLoadingBar
             _loadingBars.Add(loadingBar);
         }
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public void CleanUp()
         {
+            if (!_consoleOperator.IsConsoleApp)
+                return;
+
             GotoStart();
             Console.CursorTop++;
 
@@ -181,6 +195,7 @@ namespace ConsoleLoadingBar
             GotoStart();
         }
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public int GetStartLocation()
         {
             return _locationRow - _regulate;
@@ -189,6 +204,9 @@ namespace ConsoleLoadingBar
 
         private void GotoLineAboveNextBar()
         {
+            if (!_consoleOperator.IsConsoleApp)
+                return;
+
             int row = GetStartLocation() + (_loadingBars.Count * 2);
             if (row >= Console.BufferHeight)
                 throw new Exception("Need more space!");
@@ -198,6 +216,9 @@ namespace ConsoleLoadingBar
 
         private void MakeSureWeHaveSpaceForNewLoadingBar()
         {
+            if (!_consoleOperator.IsConsoleApp)
+                return;
+
             int asd = GetStartLocation() + ((_loadingBars.Count + 1) * 2);
             // ReSharper disable once UnusedVariable
             int regulate = _regulate; // TODO: Check if this if-else could be (_regulate != 0)

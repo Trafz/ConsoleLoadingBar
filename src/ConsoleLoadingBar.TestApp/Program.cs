@@ -2,10 +2,11 @@
 using System.Configuration;
 using System.Diagnostics;
 using System.Threading;
+using ConsoleLoadingBar.Core;
 
 namespace ConsoleLoadingBar.TestApp
 {
-    internal class Program
+    internal static class Program
     {
         private const string PressAnyKey = "Press any key to continue . . .";
         private static int _millisecondsTimeout;
@@ -85,8 +86,7 @@ namespace ConsoleLoadingBar.TestApp
                     bar.Update();
                     raceBarrier[guess]++;
 
-                    if (!hasWaited)
-                        Thread.Sleep(_millisecondsTimeout * multipleBars.LoadingBars.Count);
+                    Thread.Sleep(_millisecondsTimeout * multipleBars.LoadingBars.Count);
                 }
             }
         }
@@ -139,7 +139,7 @@ namespace ConsoleLoadingBar.TestApp
 
         private static void EndTestCase()
         {
-            PauseConsole(string.Format("TestCase completed. {0}", PressAnyKey));
+            PauseConsole(string.Format("TestCase completed. {0}{1}", Environment.NewLine, PressAnyKey));
         }
 
         private static void PauseConsole(string message = PressAnyKey, bool skipIfJustPaused = true)

@@ -1,4 +1,4 @@
-﻿namespace ConsoleLoadingBar.Enums
+﻿namespace ConsoleLoadingBar.Core.Enums
 {
     public static class LoadingBarConstAppSettingsNames
     {

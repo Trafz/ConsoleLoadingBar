@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{520B2897-05BE-484A-A521-44C0A0A8631F}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{7BEB7DFB-607B-410A-B86D-BEBD758C7BA6}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ConsoleLoadingBar.TestApp</RootNamespace>
-    <AssemblyName>ConsoleLoadingBar.TestApp</AssemblyName>
+    <RootNamespace>ConsoleLoadingBar.Core</RootNamespace>
+    <AssemblyName>ConsoleLoadingBar.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -32,26 +30,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="Annotations.cs">
+      <ExcludeFromStyleCop>True</ExcludeFromStyleCop>
+    </Compile>
+    <Compile Include="ConsoleOperator.cs" />
+    <Compile Include="Enums\LoadingBarConstAppSettingsNames.cs" />
+    <Compile Include="Enums\LoadingBarBehavior.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Helpers\LoadingBarAppSettingsHelper.cs" />
+    <Compile Include="Helpers\LoadingBarBehaviorHelper.cs" />
+    <Compile Include="SingleLoadingBar.cs" />
+    <Compile Include="MultipleLoadingBars.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="LoadingBarUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ConsoleLoadingBar\ConsoleLoadingBar.Core.csproj">
-      <Project>{7beb7dfb-607b-410a-b86d-bebd758c7ba6}</Project>
-      <Name>ConsoleLoadingBar.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
   </ItemGroup>

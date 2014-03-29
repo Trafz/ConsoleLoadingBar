@@ -401,7 +401,10 @@ namespace JetBrains.Annotations
         public PathReferenceAttribute() { }
         public PathReferenceAttribute([PathReference] string basePath)
         {
-            BasePath = basePath;
+            if (basePath != null)
+            {
+                BasePath = basePath;
+            }
         }
 
         [NotNull]

@@ -1,8 +1,8 @@
 ﻿using System;
-using ConsoleLoadingBar.Enums;
+using ConsoleLoadingBar.Core.Enums;
 using JetBrains.Annotations;
 
-namespace ConsoleLoadingBar
+namespace ConsoleLoadingBar.Core
 {
     public class SingleLoadingBar : IDisposable
     {
@@ -24,7 +24,7 @@ namespace ConsoleLoadingBar
         private readonly string _message;
 
         private int _prevGetStartLocation = -1;
-        private LoadingBarBehaviour _behaviour;
+        private LoadingBarBehavior _behavior;
         private int _alternateGetBackToRow;
         private int _previousPercentage;
         private int _current;
@@ -60,10 +60,11 @@ namespace ConsoleLoadingBar
         public int LocationLine { get; private set; }
         public int LocationRow { get; private set; }
 
-        public LoadingBarBehaviour Behaviour
+        public LoadingBarBehavior Behavior
         {
-            get { return _behaviour; }
-            set { _behaviour = value; }
+            // ReSharper disable once UnusedMember.Global
+            get { return _behavior; }
+            set { _behavior = value; }
         }
 
         public int AlternateGetBackToRow
@@ -85,7 +86,7 @@ namespace ConsoleLoadingBar
         {
             if (_consoleOperator.IsConsoleApp == false)
                 return;
-            if (percentage != 0 && percentage == _previousPercentage && _behaviour.HasFlag(LoadingBarBehaviour.OnlyUpdateMessageOnPercentageChange))
+            if (percentage != 0 && percentage == _previousPercentage && _behavior.HasFlag(LoadingBarBehavior.OnlyUpdateMessageOnPercentageChange))
                 return;
 
             lock (_syncObject)
@@ -104,7 +105,7 @@ namespace ConsoleLoadingBar
 
                 SaveTheCurrentLineIfNeeded();
 
-                if (percentage == 100 && _behaviour.HasFlag(LoadingBarBehaviour.ClearWhenHundredPercentIsHit) && !_hasCleared)
+                if (percentage == 100 && _behavior.HasFlag(LoadingBarBehavior.ClearWhenHundredPercentIsHit) && !_hasCleared)
                 {
                     int rowBefore = Console.CursorTop;
                     lock (_syncRegulate)
@@ -190,11 +191,6 @@ namespace ConsoleLoadingBar
         public int CalculatePercentage(int current, int total)
         {
             return total == 0 ? 0 : Convert.ToInt32(Math.Ceiling(current / (decimal)total * 100));
-        }
-
-        public int CalculateCurrent(int percentage)
-        {
-            return Convert.ToInt32(Math.Round(percentage / (decimal)100 * Total));
         }
 
         public void GetInitialData()

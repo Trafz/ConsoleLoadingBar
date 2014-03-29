@@ -1,7 +1,7 @@
 ﻿using System;
-using ConsoleLoadingBar.Helpers;
+using ConsoleLoadingBar.Core.Helpers;
 
-namespace ConsoleLoadingBar
+namespace ConsoleLoadingBar.Core
 {
     public class ConsoleOperator
     {
@@ -14,7 +14,7 @@ namespace ConsoleLoadingBar
         }
 
 
-        public bool IsConsoleApp { get; set; }
+        public bool IsConsoleApp { get; private set; }
 
 
         public void GotoNextLine(ref int lockedRegulateProperty)
@@ -50,6 +50,13 @@ namespace ConsoleLoadingBar
             else
                 AlmostClearLineButEndAtTheLastOne();
         }
+
+        public void GetInitialData(out int row, out int line)
+        {
+            row = Console.CursorTop;
+            line = Console.CursorLeft;
+        }
+
 
         private static void ClearLineAndEndOnNext()
         {
