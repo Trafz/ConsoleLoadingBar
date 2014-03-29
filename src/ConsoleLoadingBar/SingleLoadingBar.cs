@@ -12,18 +12,19 @@ namespace ConsoleLoadingBar
 
         // private fields
         [NotNull]
-        private readonly object _syncObject = new object();
-        [NotNull]
         private readonly object _syncRegulate = new object();
+        [NotNull]
+        private readonly object _syncObject = new object();
         [NotNull]
         private readonly ConsoleOperator _consoleOperator;
 
         private readonly int _alternateGetBackToLine = -1;
-        private readonly char _chosenChar;
         private readonly ConsoleColor _chosenColor;
+        private readonly char _chosenChar;
         private readonly string _message;
 
         private int _prevGetStartLocation = -1;
+        private LoadingBarBehaviour _behaviour;
         private int _alternateGetBackToRow;
         private int _previousPercentage;
         private int _current;
@@ -56,9 +57,14 @@ namespace ConsoleLoadingBar
         }
 
 
-        public LoadingBarBehaviour Behaviour { get; set; }
         public int LocationLine { get; private set; }
         public int LocationRow { get; private set; }
+
+        public LoadingBarBehaviour Behaviour
+        {
+            get { return _behaviour; }
+            set { _behaviour = value; }
+        }
 
         public int AlternateGetBackToRow
         {
@@ -79,7 +85,7 @@ namespace ConsoleLoadingBar
         {
             if (_consoleOperator.IsConsoleApp == false)
                 return;
-            if (percentage != 0 && percentage == _previousPercentage)
+            if (percentage != 0 && percentage == _previousPercentage && _behaviour.HasFlag(LoadingBarBehaviour.OnlyUpdateMessageOnPercentageChange))
                 return;
 
             lock (_syncObject)
@@ -98,7 +104,7 @@ namespace ConsoleLoadingBar
 
                 SaveTheCurrentLineIfNeeded();
 
-                if (percentage == 100 && Behaviour.HasFlag(LoadingBarBehaviour.ClearWhenHundredPercentIsHit) && !_hasCleared)
+                if (percentage == 100 && _behaviour.HasFlag(LoadingBarBehaviour.ClearWhenHundredPercentIsHit) && !_hasCleared)
                 {
                     int rowBefore = Console.CursorTop;
                     lock (_syncRegulate)

@@ -6,6 +6,7 @@ namespace ConsoleLoadingBar.Enums
     public enum LoadingBarBehaviour
     {
         Null = 0,
-        ClearWhenHundredPercentIsHit = 1 << 0
+        ClearWhenHundredPercentIsHit = 1 << 0,
+        OnlyUpdateMessageOnPercentageChange = 1 << 1
     }
 }
