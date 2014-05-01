@@ -82,7 +82,15 @@ namespace ConsoleLoadingBar
             Update(CalculatePercentage(_current, Total));
         }
 
-        public void Update(int percentage)
+        public void Update(string message)
+        {
+            lock (_syncObject)
+                _current++;
+
+            Update(CalculatePercentage(_current, Total));
+        }
+
+        public void Update(int percentage, string message = null)
         {
             if (_consoleOperator.IsConsoleApp == false)
                 return;
@@ -123,21 +131,12 @@ namespace ConsoleLoadingBar
                     int line, row;
                     GetCurrentPosition(out line, out row);
 
-                    string consoleMessage = string.IsNullOrWhiteSpace(_message)
-                        ? string.Format("{0} out of {1} ({2}%)", _current, Total, percentage)
-                        : string.Format("{0} - {1}%", _message, percentage);
-
                     ConsoleColor originalColor = Console.ForegroundColor;
                     Console.ForegroundColor = _chosenColor;
-                    int width = Console.WindowWidth - 1;
-                    var newWidth = (int)((width * percentage) / 100d);
-                    if (newWidth > width)
-                        newWidth = width;
-                    string progBar = new string(_chosenChar, newWidth) +
-                                     new string(' ', width - newWidth);
+
                     Console.CursorLeft = 0;
-                    Console.WriteLine(progBar);
-                    Console.Write(consoleMessage);
+                    WriteProgressBar(percentage);
+                    WriteConsoleMessage(percentage, message);
                     Console.ForegroundColor = originalColor;
                 }
 
@@ -147,6 +146,32 @@ namespace ConsoleLoadingBar
             }
         }
 
+
+
+        public void WriteProgressBar(int percentage)
+        {
+            int width = Console.WindowWidth - 1;
+            var newWidth = (int)((width * percentage) / 100d);
+            if (newWidth > width)
+                newWidth = width;
+
+            string progressBar = new string(_chosenChar, newWidth) + new string(' ', width - newWidth);
+            Console.WriteLine(progressBar);
+        }
+
+        public void WriteConsoleMessage(int percentage, string message = null)
+        {
+            if (!string.IsNullOrWhiteSpace(message))
+            {
+                Console.Write(message);
+                return;
+            }
+
+            string consoleMessage = string.IsNullOrWhiteSpace(_message)
+                ? string.Format("{0} out of {1} ({2}%)", _current, Total, percentage)
+                : string.Format("{0} - {1}%", _message, percentage);
+            Console.Write(consoleMessage);
+        }
 
         public int GetStartLocation()
         {
