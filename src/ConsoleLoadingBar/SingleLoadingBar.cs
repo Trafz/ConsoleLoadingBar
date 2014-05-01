@@ -1,8 +1,8 @@
 ﻿using System;
-using ConsoleLoadingBar.Core.Enums;
+using ConsoleLoadingBar.Enums;
 using JetBrains.Annotations;
 
-namespace ConsoleLoadingBar.Core
+namespace ConsoleLoadingBar
 {
     public class SingleLoadingBar : IDisposable
     {
@@ -22,8 +22,10 @@ namespace ConsoleLoadingBar.Core
         private readonly ConsoleColor _chosenColor;
         private readonly char _chosenChar;
         private readonly string _message;
+        private readonly DateTime _dtBegan;
 
         private int _prevGetStartLocation = -1;
+        private string _etaTimeSpanFormat = "h'h 'm'm 's's'";
         private LoadingBarBehavior _behavior;
         private int _alternateGetBackToRow;
         private int _previousPercentage;
@@ -51,6 +53,8 @@ namespace ConsoleLoadingBar.Core
             LocationLine = -1;
             LocationRow = -1;
 
+            _dtBegan = DateTime.Now;
+
             _consoleOperator = consoleOperator ?? new ConsoleOperator();
             if (_consoleOperator.IsConsoleApp)
                 GetInitialData();
@@ -73,6 +77,12 @@ namespace ConsoleLoadingBar.Core
             set { _alternateGetBackToRow = value; }
         }
 
+        public string EtaTimeSpanFormat
+        {
+            get { return _etaTimeSpanFormat; }
+            set { _etaTimeSpanFormat = value; }
+        }
+
 
         public void Update()
         {
@@ -82,7 +92,15 @@ namespace ConsoleLoadingBar.Core
             Update(CalculatePercentage(_current, Total));
         }
 
-        public void Update(int percentage)
+        public void Update(string message)
+        {
+            lock (_syncObject)
+                _current++;
+
+            Update(CalculatePercentage(_current, Total));
+        }
+
+        public void Update(int percentage, string message = null)
         {
             if (_consoleOperator.IsConsoleApp == false)
                 return;
@@ -123,21 +141,13 @@ namespace ConsoleLoadingBar.Core
                     int line, row;
                     GetCurrentPosition(out line, out row);
 
-                    string consoleMessage = string.IsNullOrWhiteSpace(_message)
-                        ? string.Format("{0} out of {1} ({2}%)", _current, Total, percentage)
-                        : string.Format("{0} - {1}%", _message, percentage);
-
                     ConsoleColor originalColor = Console.ForegroundColor;
                     Console.ForegroundColor = _chosenColor;
-                    int width = Console.WindowWidth - 1;
-                    var newWidth = (int)((width * percentage) / 100d);
-                    if (newWidth > width)
-                        newWidth = width;
-                    string progBar = new string(_chosenChar, newWidth) +
-                                     new string(' ', width - newWidth);
+
                     Console.CursorLeft = 0;
-                    Console.WriteLine(progBar);
-                    Console.Write(consoleMessage);
+                    WriteProgressBar(percentage);
+                    WriteConsoleMessage(percentage, message);
+                    AppendEta();
                     Console.ForegroundColor = originalColor;
                 }
 
@@ -147,6 +157,46 @@ namespace ConsoleLoadingBar.Core
             }
         }
 
+
+
+        public void AppendEta()
+        {
+            if (!Behavior.HasFlag(LoadingBarBehavior.AppendEtaToMessage))
+                return;
+
+            TimeSpan timeRemaining = EstimateTimeRemaining();
+
+            Console.Write(" ETA: " + timeRemaining.ToString(_etaTimeSpanFormat));
+
+            int width = Console.WindowWidth - 1;
+            int currentWidth = Console.CursorLeft;
+            Console.Write(new string(' ', width - currentWidth));
+        }
+
+        public void WriteProgressBar(int percentage)
+        {
+            int width = Console.WindowWidth - 1;
+            var newWidth = (int)((width * percentage) / 100d);
+            if (newWidth > width)
+                newWidth = width;
+
+            string progressBar = new string(_chosenChar, newWidth) + new string(' ', width - newWidth);
+            Console.WriteLine(progressBar);
+        }
+
+        public void WriteConsoleMessage(int percentage, string message = null)
+        {
+            if (!string.IsNullOrWhiteSpace(message))
+            {
+                Console.Write(message);
+                return;
+            }
+
+            string consoleMessage = string.IsNullOrWhiteSpace(_message)
+                ? string.Format("{0} out of {1} ({2}%)", _current, Total, percentage)
+                : string.Format("{0} - {1}%", _message, percentage);
+            Console.Write(consoleMessage);
+        }
 
         public int GetStartLocation()
         {
@@ -187,6 +237,22 @@ namespace ConsoleLoadingBar.Core
             Console.CursorVisible = true;
         }
 
+
+        public DateTime EstimateCompletionMoment()
+        {
+            TimeSpan eta = EstimateTimeRemaining();
+            return _dtBegan + eta;
+        }
+
+        public TimeSpan EstimateTimeRemaining()
+        {
+            return TimeSpan.FromMilliseconds(CalculateEstimatedTimeRemainingInMilliseconds());
+        }
+
+        public double CalculateEstimatedTimeRemainingInMilliseconds()
+        {
+            return ((DateTime.Now - _dtBegan).TotalMilliseconds / _current) * (Total - _current);
+        }
 
         public int CalculatePercentage(int current, int total)
         {

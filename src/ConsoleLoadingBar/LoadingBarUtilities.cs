@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace ConsoleLoadingBar.Core
+namespace ConsoleLoadingBar
 {
     public static class LoadingBarUtilities
     {

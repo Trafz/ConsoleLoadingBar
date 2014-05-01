@@ -1,8 +1,8 @@
 ﻿using System.Configuration;
-using ConsoleLoadingBar.Core.Enums;
+using ConsoleLoadingBar.Enums;
 using JetBrains.Annotations;
 
-namespace ConsoleLoadingBar.Core.Helpers
+namespace ConsoleLoadingBar.Helpers
 {
     public static class LoadingBarAppSettingsHelper
     {

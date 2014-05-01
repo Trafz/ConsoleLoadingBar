@@ -1,7 +1,7 @@
 ﻿using System;
-using ConsoleLoadingBar.Core.Helpers;
+using ConsoleLoadingBar.Helpers;
 
-namespace ConsoleLoadingBar.Core
+namespace ConsoleLoadingBar
 {
     public class ConsoleOperator
     {

@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace ConsoleLoadingBar.Core.Extensions
+namespace ConsoleLoadingBar.Extensions
 {
     public static class StringExtensions
     {

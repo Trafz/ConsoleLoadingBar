@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using ConsoleLoadingBar.Core;
 using NUnit.Framework;
 
 namespace ConsoleLoadingBar.Tests
