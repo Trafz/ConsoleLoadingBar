@@ -7,6 +7,7 @@ namespace ConsoleLoadingBar.Enums
     {
         Default = 0,
         ClearWhenHundredPercentIsHit = 1 << 0,
-        OnlyUpdateMessageOnPercentageChange = 1 << 1
+        OnlyUpdateMessageOnPercentageChange = 1 << 1,
+        AppendEtaToMessage = 1 << 2
     }
 }
