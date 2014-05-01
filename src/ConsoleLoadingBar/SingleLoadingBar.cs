@@ -1,8 +1,8 @@
 ﻿using System;
-using ConsoleLoadingBar.Core.Enums;
+using ConsoleLoadingBar.Enums;
 using JetBrains.Annotations;
 
-namespace ConsoleLoadingBar.Core
+namespace ConsoleLoadingBar
 {
     public class SingleLoadingBar : IDisposable
     {

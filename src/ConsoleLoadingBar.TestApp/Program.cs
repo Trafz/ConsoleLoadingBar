@@ -2,7 +2,6 @@
 using System.Configuration;
 using System.Diagnostics;
 using System.Threading;
-using ConsoleLoadingBar.Core;
 
 namespace ConsoleLoadingBar.TestApp
 {

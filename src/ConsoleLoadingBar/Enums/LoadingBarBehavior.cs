@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ConsoleLoadingBar.Core.Enums
+namespace ConsoleLoadingBar.Enums
 {
     [Flags]
     public enum LoadingBarBehavior

@@ -1,7 +1,7 @@
 ﻿using System;
-using ConsoleLoadingBar.Core.Enums;
+using ConsoleLoadingBar.Enums;
 
-namespace ConsoleLoadingBar.Core.Helpers
+namespace ConsoleLoadingBar.Helpers
 {
     public static class LoadingBarBehaviorHelper
     {

@@ -1,5 +1,4 @@
-﻿using ConsoleLoadingBar.Core;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace ConsoleLoadingBar.Tests
 {

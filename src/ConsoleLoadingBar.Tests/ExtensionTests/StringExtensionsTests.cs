@@ -1,8 +1,9 @@
-﻿using ConsoleLoadingBar.Core.Extensions;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace ConsoleLoadingBar.Tests.ExtensionTests
 {
+    using ConsoleLoadingBar.Extensions;
+
     [TestFixture]
     public class StringExtensionsTests
     {

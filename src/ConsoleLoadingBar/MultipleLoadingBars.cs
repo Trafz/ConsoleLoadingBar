@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using ConsoleLoadingBar.Core.Enums;
-using ConsoleLoadingBar.Core.Helpers;
+using ConsoleLoadingBar.Enums;
+using ConsoleLoadingBar.Helpers;
 using JetBrains.Annotations;
 
-namespace ConsoleLoadingBar.Core
+namespace ConsoleLoadingBar
 {
     public class MultipleConsoleLoadingBars : IDisposable
     {
